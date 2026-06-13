@@ -4,10 +4,11 @@
 #![no_main]
 #![no_std]
 
-extern crate panic_semihosting;
+// defmt global logger (RTT transport) + panic handler
+use defmt_rtt as _;
+use panic_probe as _;
 
 use cortex_m_rt::entry;
-use cortex_m_semihosting::{hprintln};
 
 use f411::{
     hal::{prelude::*, stm32, spi::Spi},
@@ -47,6 +48,6 @@ fn main() -> ! {
 
     loop {
         let m = l3gd20.all().unwrap();
-        hprintln!("m={:?}", m).unwrap();
+        defmt::println!("m={}", defmt::Debug2Format(&m));
     }
 }

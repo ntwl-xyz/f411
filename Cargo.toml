@@ -10,11 +10,11 @@ cortex-m-rt = "0.6.10"
 l3gd20 = "0.2.0"
 lsm303dlhc = "0.2.0"
 
-cortex-m-semihosting = "0.3.3"
-panic-semihosting = "0.5.3"
+defmt = "0.3"
+defmt-rtt = "0.3"
+panic-probe = { version = "0.3", features = ["print-defmt"] }
 
 # panic-halt = "0.2.0"
-# panic-itm = "0.4.1"
 # alloc-cortex-m = "0.3.5"
 
 [dependencies.stm32f4]

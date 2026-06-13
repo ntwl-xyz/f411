@@ -4,8 +4,9 @@
 #![no_std]
 #![no_main]
 
-// Panic handler
-extern crate panic_semihosting;
+// defmt global logger (RTT transport) + panic handler
+use defmt_rtt as _;
+use panic_probe as _;
 
 use cortex_m_rt::entry;
 use f411::{

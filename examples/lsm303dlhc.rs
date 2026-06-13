@@ -1,10 +1,11 @@
 #![no_std]
 #![no_main]
 
-extern crate panic_semihosting;
+// defmt global logger (RTT transport) + panic handler
+use defmt_rtt as _;
+use panic_probe as _;
 
 use cortex_m_rt::entry;
-use cortex_m_semihosting::{hprintln};
 
 use f411::{
     hal::{prelude::*, stm32, i2c::I2c},
@@ -27,15 +28,15 @@ fn main() -> ! {
 
     let mut lsm303dlhc = Lsm303dlhc::new(i2c).unwrap();
 
-    hprintln!("initialised lsm303dlhc").unwrap();
+    defmt::println!("initialised lsm303dlhc");
 
     loop {
         let accel = lsm303dlhc.accel().unwrap();
         let mag = lsm303dlhc.mag().unwrap();
         let temp = lsm303dlhc.temp().unwrap();
 
-        hprintln!("accel={:?}", accel).unwrap();
-        hprintln!("mag={:?}", mag).unwrap();
-        hprintln!("temp={:?}", temp).unwrap();
+        defmt::println!("accel={}", defmt::Debug2Format(&accel));
+        defmt::println!("mag={}", defmt::Debug2Format(&mag));
+        defmt::println!("temp={}", defmt::Debug2Format(&temp));
     }
 }
