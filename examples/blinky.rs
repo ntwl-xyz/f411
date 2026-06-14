@@ -10,23 +10,19 @@ use panic_probe as _;
 
 use cortex_m_rt::entry;
 use f411::{
-    led::{Leds},
-    hal::{delay::Delay, prelude::*, stm32},
+    hal::{pac, prelude::*},
+    led::Leds,
 };
 
 #[entry]
 fn main() -> ! {
     let cp = cortex_m::Peripherals::take().unwrap();
+    let dp = pac::Peripherals::take().unwrap();
 
-    // stm32 in this case internally refers to the stm32f411 lib inside the HAL
-    let peripherals = stm32::Peripherals::take().unwrap();
+    let mut rcc = dp.RCC.constrain();
+    let gpiod = dp.GPIOD.split(&mut rcc);
 
-    let rcc = peripherals.RCC.constrain();
-    let gpiod = peripherals.GPIOD.split();
-
-    // clock configuration using the default settings (all clocks run at 8 MHz)
-    let clocks = rcc.cfgr.freeze();
-    let mut delay = Delay::new(cp.SYST, clocks);
+    let mut delay = cp.SYST.delay(&rcc.clocks);
 
     let mut leds = Leds::new(gpiod);
     let mut i = 0;
@@ -37,7 +33,7 @@ fn main() -> ! {
         }
 
         leds[i].on();
-        delay.delay_ms(100_u16);
+        delay.delay_ms(100u32);
         i = (i + 1) % 4;
     }
 }

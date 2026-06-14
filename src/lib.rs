@@ -5,20 +5,16 @@ pub extern crate l3gd20;
 pub extern crate lsm303dlhc;
 pub extern crate stm32f4xx_hal as hal;
 
-use hal::gpio::gpioa::{PA5, PA6, PA7};
-use hal::gpio::gpiob::{PB6, PB9};
-use hal::gpio::gpioe::{PE3};
-use hal::gpio::{Output, PushPull, Alternate, AF4, AF5};
-// wrap the gpio output pins in a v1 compatibility trait for the l3gd20 driver
-use hal::hal::digital::v1_compat::{OldOutputPin};
+use hal::gpio::gpioe::PE3;
+use hal::gpio::{Output, PushPull};
 use hal::i2c::I2c;
 use hal::spi::Spi;
-use hal::stm32::{I2C1, SPI1};
+use hal::pac::{I2C1, SPI1};
 
 pub mod led;
 
 /// On board L3GD20 connected to the SPI1 bus via the pins PA5, PA6, PA7 and PE3
-pub type L3gd20 = l3gd20::L3gd20<Spi<SPI1, (PA5<Alternate<AF5>>, PA6<Alternate<AF5>>, PA7<Alternate<AF5>>)>, OldOutputPin<PE3<Output<PushPull>>>>;
+pub type L3gd20 = l3gd20::L3gd20<Spi<SPI1>, PE3<Output<PushPull>>>;
 
 /// On board LSM303DLHC connected to the I2C1 bus via the PB6 and PB9 pins
-pub type Lsm303dlhc = lsm303dlhc::Lsm303dlhc<I2c<I2C1, (PB6<Alternate<AF4>>, PB9<Alternate<AF4>>)>>;
+pub type Lsm303dlhc = lsm303dlhc::Lsm303dlhc<I2c<I2C1>>;

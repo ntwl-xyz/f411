@@ -10,7 +10,13 @@ fn main() {
         .unwrap()
         .write_all(include_bytes!("memory.x"))
         .unwrap();
-    println!("cargo:rustc-link-search={}", out.display());
+
+    // Scope the memory map to THIS crate's own examples only. Using
+    // `rustc-link-arg-examples` (instead of `rustc-link-search`) means the
+    // search path is NOT propagated to downstream crates that depend on f411:
+    // applications must supply their own memory.x. This keeps f411 a
+    // pure board-support library while still letting its examples link.
+    println!("cargo:rustc-link-arg-examples=-L{}", out.display());
 
     // Only re-run the build script when memory.x is changed,
     // instead of when any part of the source code changes.

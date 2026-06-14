@@ -6,25 +6,22 @@ use defmt_rtt as _;
 use panic_probe as _;
 
 use cortex_m_rt::entry;
-
 use f411::{
-    hal::{prelude::*, stm32, i2c::I2c},
+    hal::{i2c::I2c, pac, prelude::*, rcc::Config},
     Lsm303dlhc,
 };
 
 #[entry]
 fn main() -> ! {
-    let p = stm32::Peripherals::take().unwrap();
+    let p = pac::Peripherals::take().unwrap();
 
-    let rcc = p.RCC.constrain();
+    let mut rcc = p.RCC.freeze(Config::hsi().sysclk(64.MHz()).pclk1(32.MHz()));
 
-    let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze();
+    let gpiob = p.GPIOB.split(&mut rcc);
+    let scl = gpiob.pb6;
+    let sda = gpiob.pb9;
 
-    let gpiob = p.GPIOB.split();
-    let scl = gpiob.pb6.into_alternate_af4();
-    let sda = gpiob.pb9.into_alternate_af4();
-
-    let i2c = I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks);
+    let i2c = I2c::new(p.I2C1, (scl, sda), 400.kHz(), &mut rcc);
 
     let mut lsm303dlhc = Lsm303dlhc::new(i2c).unwrap();
 

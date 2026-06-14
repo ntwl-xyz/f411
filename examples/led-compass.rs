@@ -10,7 +10,7 @@ use panic_probe as _;
 
 use cortex_m_rt::entry;
 use f411::{
-    hal::{delay::Delay, i2c::I2c, prelude::*, stm32},
+    hal::{i2c::I2c, pac, prelude::*, rcc::Config},
     led::LedCompass,
     Lsm303dlhc,
 };
@@ -18,23 +18,22 @@ use f411::{
 #[entry]
 fn main() -> ! {
     let cp = cortex_m::Peripherals::take().unwrap();
-    let p = stm32::Peripherals::take().unwrap();
+    let p = pac::Peripherals::take().unwrap();
 
-    let rcc = p.RCC.constrain();
-    let clocks = rcc.cfgr.sysclk(64.mhz()).pclk1(32.mhz()).freeze();
+    let mut rcc = p.RCC.freeze(Config::hsi().sysclk(64.MHz()).pclk1(32.MHz()));
 
     // user LEDs on GPIOD
-    let gpiod = p.GPIOD.split();
+    let gpiod = p.GPIOD.split(&mut rcc);
     let mut compass = LedCompass::new(gpiod);
 
     // on-board LSM303DLHC magnetometer on I2C1 (PB6 = SCL, PB9 = SDA)
-    let gpiob = p.GPIOB.split();
-    let scl = gpiob.pb6.into_alternate_af4();
-    let sda = gpiob.pb9.into_alternate_af4();
-    let i2c = I2c::i2c1(p.I2C1, (scl, sda), 400.khz(), clocks);
+    let gpiob = p.GPIOB.split(&mut rcc);
+    let scl = gpiob.pb6;
+    let sda = gpiob.pb9;
+    let i2c = I2c::new(p.I2C1, (scl, sda), 400.kHz(), &mut rcc);
     let mut lsm303dlhc = Lsm303dlhc::new(i2c).unwrap();
 
-    let mut delay = Delay::new(cp.SYST, clocks);
+    let mut delay = cp.SYST.delay(&rcc.clocks);
 
     loop {
         let mag = lsm303dlhc.mag().unwrap();
@@ -68,6 +67,6 @@ fn main() -> ! {
 
         defmt::println!("mag x={} y={}", x, y);
 
-        delay.delay_ms(100_u16);
+        delay.delay_ms(100u32);
     }
 }

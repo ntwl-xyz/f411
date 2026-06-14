@@ -2,10 +2,8 @@
 
 use core::ops;
 
-use hal::prelude::*;
-
 // use hal::gpio::gpioa::{self, PA, PA9};
-use hal::gpio::gpiod::{self, PD, PD5, PD12, PD13, PD14, PD15};
+use hal::gpio::gpiod::{self, PDn, PD5, PD12, PD13, PD14, PD15};
 use hal::gpio::{Output, PushPull};
 
 /// ## USB LEDs
@@ -48,7 +46,7 @@ pub enum LedColor {
 
 /// One of the on-board user LEDs
 pub struct Led {
-    pex: PD<Output<PushPull>>,
+    pex: PDn<Output<PushPull>>,
 }
 
 
@@ -123,7 +121,7 @@ macro_rules! ctor {
             impl Into<Led> for $ldx {
                 fn into(self) -> Led {
                     Led {
-                        pex: self.downgrade(),
+                        pex: self.erase_number(),
                     }
                 }
             }
@@ -138,12 +136,12 @@ ctor!(LD3, LD4, LD5, LD6, LD8);
 impl Led {
     /// Turns the LED off
     pub fn off(&mut self) {
-        self.pex.set_low().unwrap();
+        self.pex.set_low();
     }
 
     /// Turns the LED on
     pub fn on(&mut self) {
-        self.pex.set_high().unwrap();
+        self.pex.set_high();
     }
 }
 

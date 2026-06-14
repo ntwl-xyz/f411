@@ -5,10 +5,13 @@ authors = ["ntr <ntr@smokestack.io>"]
 edition = "2018"
 
 [dependencies]
-cortex-m = "0.6.0"
-cortex-m-rt = "0.6.10"
-l3gd20 = "0.2.0"
+cortex-m = "0.7.7"
+cortex-m-rt = "0.7.5"
+l3gd20 = "0.3.0"
 lsm303dlhc = "0.2.0"
+
+# math for the thermistor Beta equation (ln) in no_std
+libm = "0.2"
 
 defmt = "0.3"
 defmt-rtt = "0.3"
@@ -18,12 +21,12 @@ panic-probe = { version = "0.3", features = ["print-defmt"] }
 # alloc-cortex-m = "0.3.5"
 
 [dependencies.stm32f4]
-version = "0.9.0"
+version = "0.16.0"
 features = ["stm32f411", "rt"]
 
 [dependencies.stm32f4xx-hal]
-version = "0.6.0"
-features = ["stm32f411", "rt"]
+version = "0.23.0"
+features = ["stm32f411"]
 
 [profile.release]
 codegen-units = 1 # better optimizations
