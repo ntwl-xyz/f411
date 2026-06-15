@@ -32,8 +32,8 @@ fn main() -> ! {
         let mag = lsm303dlhc.mag().unwrap();
         let temp = lsm303dlhc.temp().unwrap();
 
-        defmt::println!("accel={}", defmt::Debug2Format(&accel));
-        defmt::println!("mag={}", defmt::Debug2Format(&mag));
-        defmt::println!("temp={}", defmt::Debug2Format(&temp));
+        defmt::println!("accel x={} y={} z={}", accel.x, accel.y, accel.z);
+        defmt::println!("mag x={} y={} z={}", mag.x, mag.y, mag.z);
+        defmt::println!("temp={}", temp);
     }
 }

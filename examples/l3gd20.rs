@@ -56,6 +56,12 @@ fn main() -> ! {
 
     loop {
         let m = l3gd20.all().unwrap();
-        defmt::println!("m={}", defmt::Debug2Format(&m));
+        defmt::println!(
+            "gyro x={} y={} z={} temp={}",
+            m.gyro.x,
+            m.gyro.y,
+            m.gyro.z,
+            m.temp
+        );
     }
 }
